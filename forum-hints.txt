@@ -1,0 +1,98 @@
+Once you develop your model, you'll use it to predict the class of each of the 20 records in the test file.  Then, you will create 20 separate .txt files, each containing the prediction for one and only one test record.  So each file will only contain one line, and on that one line, there will be only a single character - the letter representing your predicted class for that test record.  You will then submit each of these files through the course website.
+
+The code on the submission page allows you to quickly generate the 20 .txt files assuming you have all of your 20 predictions stored in a dataframe or vector.
+
+------------------
+
+One thing I didn't understand from the lectures is that caret's train() function is optimizing model parameters during its run.  That's why it takes so long.  For example method="glmnet" has two parameters -- a regularization term and a blending term.  The train() function (somehow) first picks a range for each parameter.  I think it picks 3 values for each by default.  It then estimates accuracy by boosting, k-fold cross-validation or whatever. 
+
+For my example with glmnet, say we specify 10-fold cross-validation, repeated 3 times.  That means train() builds 10 folds * 3 repeats * 3^2 parameter combinations = 270 models.  It then selects the best one.  I believe the final model is retrained with all the samples before it is returned. 
+
+If you want a good set of parameters, you would somehow need to do what train() does.  You could do that by creating a training set to build models, a validation set to evaluate parameters, and a testing set for final error estimation.  Or you could build a training set and a testing set, let train() select parameters with cross-validation, and again use the testing set for final evaluation
+
+---------------------
+
+
+Make sure that the data class for each predictor that you decided to keep is the same in each data set as some of the variables have different classes between the two data sets. Further, if you chose to include any factor variables as predictors then check that they have the same number of factor levels. It seems that predict.randomForest does not work if these two conditions are not met.
+
+You might review the output of str(training) and str(testing).  Comparing them will show if the type of predictor matches for each variable.
+
+----------------------
+
+I believe the "out-of-sample error" is the error rate on data that was NOT used to tune or train the model. 
+
+The formula you suggest, Error = 1 - Accuracy, is the one that makes sense to me
+
+----------------------
+
+Shoko,
+
+Same for me.....did you keep the participants name in the dataset? Ordinarily that would scream "over fitting" to me but in this case it was in the 20 sample data set so I included it. I wonder what would happen without that variable in the data set?
+
+In real life, if I was trying to make a good forecast of proper technique, I would never make a model to forecast an individual's performance. 
+
+The objective in this case was a good grade sooooooo...... :)
+
+--
+
+if you look at the data from the test dataset to pick the predictors, you are intentionally over-fitting your model.
+
+In my case, I only conserved data from the device sensors and I got the 20 samples good. In fact, I did not even look at the test dataset. A good pre-processing and the good algorithm can do the job !
+
+-----------------------------
+
+does this model make sense?
+
+> modelFitRPart <- train(classe ~ ., data=red, method="rpart")
+> print(modelFitRPart$finalModel)
+
+Well, pitch_forearm is only below -33.95 for Carlitos, Jeremy and Eurico, and almost only when they do a correctly executed exercise (class A), just few class B's in there. It's never below -33.95 for Adelmo, Pedro, or Charles. So it is an almost perfect classifier for the three guys, but doesn't help with three others at all. 
+
+
+As for that measurement means, that's pretty hard to deduce from the data and paper.. From a non-expert guess, 0 forearm pitch would mean that the arm (and the sensor) is parallel to torso, appropriate for doing a bicep curl, and negative or positive values would mean the arm is lifted forwards or backwards. But that is not the case, as Jeremy does class A at either -34 forearm_pitch or below, or at above 55 or so, class B at something like -20 to -34 or +40 to -55, class E around 0 (I'm just estimating from a plot). Adelmo's pitch_forearm, on the other hand, is always exactly 0, and probably should be NA - it's not like his forearm only move undetectably small amounts. Others are different in their own unique ways.
+
+
+look at the accuracy if it makes sense
+
+------------------------------
+
+out-of-sample-error/cross-validation
+
+I've used a random forest and was able to predict all the 20 test values correctly an my confusion matrix on the test data looks like this:
+
+                     Reference
+Prediction    A    B    C    D    E
+         A 1394    3    0    0       0
+         B    1  946    1    0        0
+         C    0    0  854    6        0
+         D    0    0    0   797        0
+         E    0    0    0     1      901
+---
+
+It's a little bit confusing, as the lectures on cross-validation and random forests are not all that explicit about validation strategies, and the 20-case test data is bit odd. Random forest automatically samples the data for each forest run and estimates the out-of-bag error for those left out - i.e. random forests has cross-validation built in to help choose between models. Some would call the data used to choose between models validation data, I guess, instead of test data. You can calculate your true out-of-sample error from this table, as this data was not used to make any choices in the model. You did cross-validation as part of your random forest modeling, and you did it by estimating the out-of-sample error on unused data too, depending on definition.
+
+------------------------------------------
+
+look at histogram: exclude variables? log-transform? add any other variable to discriminate better?
+
+I have not had the time to dig in and look at all of the variables univariately like this.  However, dont be mislead into thinking that because you dont have a pretty histogram that something needs to be done.  In fact in classification problems like this, patterns like that may actually be caused by the different techniques of the user and those two shapes may very well be showing you the difference between a good exercise technique and a bad one, making it a great variable for classification.
+
+------------------------------------
+
+My experience tells me that you need not touch the training set, the only thing which is important is that the variables and type of the variables in the training set should match in both the test and training set i.e. you can have 160 variables in the test set and 60 in the training set and predictions will work. What you cannot have is for e.g. say variable X of type numeric in the training set and the same variable X as integer or factor in the test set.
+
+and look that all are the same, i.e. factor variables
+
+some removed rows with variable window == "yes" and empty columns
+
+Try predict.train() instead predict()
+
+----------------------------------------
+
+rattle()    #what a great data-cleaning and mining tool
+Latticist and GGobi   packages: also cool!
+
+-----------------------------------------
+
+
+
