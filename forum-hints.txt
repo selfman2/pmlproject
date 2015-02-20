@@ -94,5 +94,141 @@ Latticist and GGobi   packages: also cool!
 
 -----------------------------------------
 
+As for rendering images inside Rmd files on github, I don't think that's possible. However, images do render if you upload the md file that corresponds to your Rmd along with the image files (keeping the folder structure that knitr generates). The caveat is that you need to tell knitr to output images files separately. By default recent RStudio versions set up knitr to embed images in the output html. This breaks the displaying of images on github. So you need to tell RStudio to set up knitr to output images as separate files that you can then upload. Two settings in the Rmd document prologue (the initial paragraph between ----- marks) control image and md file generation: self_contained = FALSE, keep_md = TRUE
+
+-------------------------------------------
+create a gh-page
+
+create a html file xxx.html in your project/folder
+git branch gh-pages
+git checkout gh-pages
+git push origin gh-pages
+then just put an empty .nojekyll file in the branch
+git add .nojekyll
+git commit -a -m "added .nojekyll"
+git push origin gh-pages
+find your presentation http://selfman2.github.io/folder/xxx.html
+
+-----------------------------------------
+
+data cleaning:
+
+I also noticed that the dataset has two flavors of missing, you can handle these in read.csv with something like this:
+na.strings=c("","NA")
+
+Also consider the #DIV/0!, which can change each variable mode
+
+
+Without trying to give away too much, there is common theme in the records that do NOT have NA. It requires using a filter on another field, which I believe should be done based on what those records appear to contain and because none of the values in the test set have the value that I'm filtering out.
+
+When I filter out those records, many fields are either all blank or all NA, and then it's obvious that they should be ignored/removed.
+
+What about the na.action = na.omit
+
+http://stackoverflow.com/questions/7330915/removing-columns-with-missing-values
+
+Without giving too much away...I encourage you to read the supporting paper accompanying the initial project that generated the data. In that paper, it describes how the researchers used varying time windows to capture some interesting facts about the subjects' performance.
+
+You should not remove rows from the training set. The "yes" rows are not NA across all predictors. I encourage you to think carefully about what you are giving up by removing observations vs. what you are getting by dropping variables that are plagued by NAs.
+
+
+
+Well, I will tell you my point . There is something like the " 80/20 Paretto rule " . You have started with a dataset containing 160 variables, when dropping all the column with "NA's" you shall have roughly about 60 variables under way. But even there is something " too much " in you dataset : 0.2*160 = 32 variables.
+
+I do not claim to be always right, but only practical . In the real world it often works like that.
+
+Consider yourself :
+1 ) After getting your 60 vars, isolate the numerical ones and detect collinearities , at least by R square. Before applying anything other.
+
+2)  Keep your model understandable, which a forest of variables hardly can be.
+
+
+I suggest to see Lecture 5 - Week 2: Basic Preprocessing.
+
+
+
+
+    Project Data Set / Original Data Set: both data sets must be clean because:
+
+        The researchers included on the data sets same calculations like kurtosis, average, maximal, minimal values, etc.
+
+        This calculations were made for groups of measurements define by the column “New Window” to filter some noise.
+
+        This is the cause of having “NA” Values
+
+        Same calculations made by the researchers, are not necessary wrong, but not in the right column (for example calculate by yourself  max_roll: maximal value for the roll position for a window of measurements)
+
+    I’m not saying that the conclusions of the researchers are wrong. I only say, that the data set must be clean before using it.
+
+    Although I did not finish yet the cleaning of the data sets, as initial conclusions:
+
+        All columns with calculations done by researchers must be deleted
+
+        Your tidy data set should have the following columns
+
+            user_name
+
+            classe
+
+            raw_timestamp_part_1 / part_2: times for measurements (use POSIXct)
+
+            new_window - num_window: to see when a group of measurements start / finish.
+
+            48 columns with the sensor measurements.
+
+    It is possible that finally the data set do not need the columns “raw_timestamp_part_1 / part_2” and / or new – num_window, but at least 50 columns defined by the “user_name”, “classe”, and 48 columns with the sensor measurements.
+
+Finally, there is a reason for deleting “NA” values and some columns.
+
+
+
+
+
+Until now I have the following columns: “user_name”, “classe”, “new_window”, “num_window”, 48 sensor data and:
+
+    From the “raw_timestamp_part_1” with POSIXct, I obtained date and time (assume as starting time)
+
+
+
+According with this, I will ignore:
+
+    Time and treat measurements as independent observations as Arho said
+
+    user_name
+
+    I will work with the 12 x 4 sensors = 48 variables
+
+
+
+
+I had the same question/concern. If you read the cited paper, the authors ended up picking 17 features based on summary statistics calculated at the end of each sliding window. These seem to be the columns with e.g. mean, variance, skew etc. in their names. These summary stats columns contain valid (non-NA) values only for rows which have new_window = 'yes' (presumably that's the marker for the end of each sliding window). However, the testing dataset only comes with raw data, with none of the summary stats (new_window == 'no' for all 20 rows) This means we are forced to drop them off the training set. Thoughts?
+
+
+
+
+
+-----------------------------------------
+
+You should keep track of your cross-validated errors and use whatever algorithm produces the most accurate predictions
+
+
+I should have been more clear. I did settle on one final algorithm (I didn't end up doing any prediction stacking or anything like that). What I mean is that I trained the data on two different algorithms and stopped at that point because the send one I chose had 99% cross-validated out-of-sample error.
+
+I can confirm that I used only approaches learned from the lectures, with very slight tweaks to the tuning parameters.
+
+So my suggestion to you is to work through various classification techniques and compare the out-of-sample (cross-validated) error that each yields. 
+
+Using the nzv from caret per user gives some interesting results as well, seems like we have some defect sensors in the set. It is a good question if one should retain data with measurement problems in the training set.
+
+---------------------------
+
+preprocessing and imputation
+
+preObj <- preProcess(train.pre.df[,impute_cols],method="knnImpute")
+train.pre2.df <- predict(preObj, train.pre.df[,impute_cols])
+----------------------------
+
+
+
 
 
