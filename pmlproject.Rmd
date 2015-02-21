@@ -40,16 +40,30 @@ testing<-dsclean[-inTrain,]
 
 ## Here fitting different models with training data
 ```{r}
-modFit_rpart<-rpart(classe ~ .,data=training)
-modFit_rforest<-randomForest(formula=classe~.,data=training,ntree=500)
+#modFit_rpart<-rpart(classe ~ .,data=training)
 #modFit_glm<-train(classe~.,method="glm",data=training)
+modFit_rforest<-randomForest(formula=classe~.,data=training,ntree=500)
+#looking at some figures first, before we accept the modFit_rforest
+modFit_rforest$confusion
+modFit_rforest$importance
+modFit_rforest$err.rate
+modFit_rforest$votes
 ```
 
-
-
-## helper function for submitting
+## Here predicting on training/testing, respectively validation-data
 ```{r}
-# requirement therefore: x must be vector in form of:   answers <- rep("A", 20)
+### first: check that colnames of training/testing and validate match!!!
+pred_testing<-predict(modFit_rforest,testing)
+table(pred_testing,testing$classe)
+
+### finally predict on validation-data for latter submission
+pred_validate<-predict(modFit_rforest,data_validate)
+pred_validate_as_char<-as.character(pred_validate)
+```
+
+## helper function for submitting + final submission
+```{r}
+# requirement therefore: x must be char-vector in form of: answers <- rep("A", 20)
 pml_write_files = function(x){
   n = length(x)
   for(i in 1:n){
@@ -57,4 +71,8 @@ pml_write_files = function(x){
     write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
   }
 }
+
+###
+### generating 20 files for submission from my vector of chars
+pml_write_files(pred_validate_as_char)
 ```

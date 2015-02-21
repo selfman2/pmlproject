@@ -108,6 +108,16 @@ git add .nojekyll
 git commit -a -m "added .nojekyll"
 git push origin gh-pages
 find your presentation http://selfman2.github.io/folder/xxx.html
+switch back to master branch: git checkout master
+--
+if you want to merge updated/new stuff into gh-pages branch:
+- add/commit new stuff in master branch
+- push new stuff to remote github.com directory
+- switch locally to gh-pages branch with: git checkout gh-pages
+- merge the master stuff into the gh-pages branch
+	git merge master
+- switch back to master branch with git checkout master
+
 
 -----------------------------------------
 
