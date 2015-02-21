@@ -8,6 +8,8 @@ output: html_document
 
 ## Here loading necessary libraries
 ```{r}
+library(lattice)
+library(ggplot2)
 library(stats)
 library(foreign)
 library(caret)
@@ -25,7 +27,7 @@ data_samples<-read.csv("data//pml-training.csv",header = T,na.strings = c(""," "
 ```{r}
 colneed2goIN<-which(colSums(is.na(data_samples))>19000) #find those with more than 19000 NAs
 data_samples_clean_tmp1<-data_samples[,-c(colneed2goIN)] #sort those NAs out
-data_samples_clean_tmp2<-data_samples_clean_tmp1[,-c(1:7)] #sort column 1 to 7 out, as inneccesary for model/prediction
+data_samples_clean_tmp2<-data_samples_clean_tmp1[,-c(1:7)] #sort column 1 to 7 out, as inneccesary for model/pr
 dsclean<-data_samples_clean_tmp2
 ```
 
@@ -41,4 +43,18 @@ testing<-dsclean[-inTrain,]
 modFit_rpart<-rpart(classe ~ .,data=training)
 modFit_rforest<-randomForest(formula=classe~.,data=training,ntree=500)
 #modFit_glm<-train(classe~.,method="glm",data=training)
+```
+
+
+
+## helper function for submitting
+```{r}
+# requirement therefore: x must be vector in form of:   answers <- rep("A", 20)
+pml_write_files = function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename = paste0("problem_id_",i,".txt")
+    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+}
 ```

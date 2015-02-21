@@ -97,7 +97,7 @@ Latticist and GGobi   packages: also cool!
 As for rendering images inside Rmd files on github, I don't think that's possible. However, images do render if you upload the md file that corresponds to your Rmd along with the image files (keeping the folder structure that knitr generates). The caveat is that you need to tell knitr to output images files separately. By default recent RStudio versions set up knitr to embed images in the output html. This breaks the displaying of images on github. So you need to tell RStudio to set up knitr to output images as separate files that you can then upload. Two settings in the Rmd document prologue (the initial paragraph between ----- marks) control image and md file generation: self_contained = FALSE, keep_md = TRUE
 
 -------------------------------------------
-create a gh-page
+how to create a gh-page:
 
 create a html file xxx.html in your project/folder
 git branch gh-pages
