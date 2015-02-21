@@ -39,6 +39,7 @@ dsclean<-data_samples_clean_tmp2
 
 ## Here partitioning the data
 ```{r}
+set.seed(13323) #for reproducability
 inTrain<-createDataPartition(y=dsclean$classe, p=0.7,list=FALSE)
 training<-dsclean[inTrain,]
 testing<-dsclean[-inTrain,]
@@ -59,8 +60,13 @@ head(modFit_rforest$votes,200) #shortened! otherwise, way too long for report
 ## Here predicting on training/testing, respectively validation-data
 ```{r}
 ### first: check that colnames of training/testing and validate match!!!
+# pred_testing<-predict(modFit_rpart,newdata=testing,type="class")
 pred_testing<-predict(modFit_rforest,testing)
 table(pred_testing,testing$classe)
+
+### crossvalidation, but not quite sure, how to interpret this rightly
+training_s<-training[,c(1:52)]
+my_rfcv<-rfcv(training_s,training$classe,cv.fold=5)
 
 ### finally predict on validation-data for latter submission
 pred_validate<-predict(modFit_rforest,data_validate)
