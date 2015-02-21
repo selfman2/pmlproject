@@ -44,3 +44,17 @@ modFit_rpart<-rpart(classe ~ .,data=training)
 modFit_rforest<-randomForest(formula=classe~.,data=training,ntree=500)
 #modFit_glm<-train(classe~.,method="glm",data=training)
 ```
+
+
+
+## helper function for submitting
+```{r}
+# requirement therefore: x must be vector in form of:   answers <- rep("A", 20)
+pml_write_files = function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename = paste0("problem_id_",i,".txt")
+    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+}
+```
