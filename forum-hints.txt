@@ -104,6 +104,7 @@ git branch gh-pages
 git checkout gh-pages
 git push origin gh-pages
 then just put an empty .nojekyll file in the branch
+touch .nojekyll
 git add .nojekyll
 git commit -a -m "added .nojekyll"
 git push origin gh-pages
@@ -152,13 +153,13 @@ I suggest to see Lecture 5 - Week 2: Basic Preprocessing.
 
         The researchers included on the data sets same calculations like kurtosis, average, maximal, minimal values, etc.
 
-        This calculations were made for groups of measurements define by the column “New Window” to filter some noise.
+        This calculations were made for groups of measurements define by the column ?New Window? to filter some noise.
 
-        This is the cause of having “NA” Values
+        This is the cause of having ?NA? Values
 
         Same calculations made by the researchers, are not necessary wrong, but not in the right column (for example calculate by yourself  max_roll: maximal value for the roll position for a window of measurements)
 
-    I’m not saying that the conclusions of the researchers are wrong. I only say, that the data set must be clean before using it.
+    I?m not saying that the conclusions of the researchers are wrong. I only say, that the data set must be clean before using it.
 
     Although I did not finish yet the cleaning of the data sets, as initial conclusions:
 
@@ -176,17 +177,17 @@ I suggest to see Lecture 5 - Week 2: Basic Preprocessing.
 
             48 columns with the sensor measurements.
 
-    It is possible that finally the data set do not need the columns “raw_timestamp_part_1 / part_2” and / or new – num_window, but at least 50 columns defined by the “user_name”, “classe”, and 48 columns with the sensor measurements.
+    It is possible that finally the data set do not need the columns ?raw_timestamp_part_1 / part_2? and / or new ? num_window, but at least 50 columns defined by the ?user_name?, ?classe?, and 48 columns with the sensor measurements.
 
-Finally, there is a reason for deleting “NA” values and some columns.
-
-
+Finally, there is a reason for deleting ?NA? values and some columns.
 
 
 
-Until now I have the following columns: “user_name”, “classe”, “new_window”, “num_window”, 48 sensor data and:
 
-    From the “raw_timestamp_part_1” with POSIXct, I obtained date and time (assume as starting time)
+
+Until now I have the following columns: ?user_name?, ?classe?, ?new_window?, ?num_window?, 48 sensor data and:
+
+    From the ?raw_timestamp_part_1? with POSIXct, I obtained date and time (assume as starting time)
 
 
 
