@@ -2,7 +2,13 @@
 title: "Predicting the manner of belldrum excercises"
 author: "Bernhard Thoni"
 date: "February 22, 2015"
-output: html_document
+output:
+  html_document:
+    fig_caption: yes
+    highlight: espresso
+    number_sections: yes
+    theme: cosmo
+    toc: yes
 ---
 
 
@@ -46,8 +52,8 @@ modFit_rforest<-randomForest(formula=classe~.,data=training,ntree=500)
 #looking at some figures first, before we accept the modFit_rforest
 modFit_rforest$confusion
 modFit_rforest$importance
-modFit_rforest$err.rate
-modFit_rforest$votes
+head(round(modFit_rforest$err.rate,5),100) #shortened! otherwise, way too long
+head(modFit_rforest$votes,200) #shortened! otherwise, way too long for report
 ```
 
 ## Here predicting on training/testing, respectively validation-data
@@ -67,7 +73,7 @@ pred_validate_as_char<-as.character(pred_validate)
 pml_write_files = function(x){
   n = length(x)
   for(i in 1:n){
-    filename = paste0("problem_id_",i,".txt")
+    filename = paste0("results//problem_id_",i,".txt")
     write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
   }
 }
