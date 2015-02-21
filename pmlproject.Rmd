@@ -13,7 +13,7 @@ output:
 
 
 ## Here loading necessary libraries
-```{r}
+```{r libraryloading}
 library(lattice)
 library(ggplot2)
 library(stats)
@@ -24,13 +24,13 @@ library(randomForest)
 ```
 
 ## Here importing the data 
-```{r}
+```{r importingdata}
 data_validate<-read.csv("data//pml-testing.csv",header = T,na.strings = c(""," ","NA","#DIV/0!"),strip.white=T)
 data_samples<-read.csv("data//pml-training.csv",header = T,na.strings = c(""," ","NA"),strip.white=T)
 ```
 
 ## Here cleaning the data
-```{r}
+```{r cleaningdata}
 colneed2goIN<-which(colSums(is.na(data_samples))>19000) #find those with more than 19000 NAs
 data_samples_clean_tmp1<-data_samples[,-c(colneed2goIN)] #sort those NAs out
 data_samples_clean_tmp2<-data_samples_clean_tmp1[,-c(1:7)] #sort column 1 to 7 out, as inneccesary for model/pr
@@ -38,7 +38,7 @@ dsclean<-data_samples_clean_tmp2
 ```
 
 ## Here partitioning the data
-```{r}
+```{r partitioningdata}
 set.seed(13323) #for reproducability
 inTrain<-createDataPartition(y=dsclean$classe, p=0.7,list=FALSE)
 training<-dsclean[inTrain,]
@@ -46,7 +46,7 @@ testing<-dsclean[-inTrain,]
 ```
 
 ## Here fitting different models with training data
-```{r}
+```{r models}
 #modFit_rpart<-rpart(classe ~ .,data=training)
 #modFit_glm<-train(classe~.,method="glm",data=training)
 modFit_rforest<-randomForest(formula=classe~.,data=training,ntree=500)
@@ -58,7 +58,7 @@ head(modFit_rforest$votes,200) #shortened! otherwise, way too long for report
 ```
 
 ## Here predicting on training/testing, respectively validation-data
-```{r}
+```{r prediction}
 ### first: check that colnames of training/testing and validate match!!!
 # pred_testing<-predict(modFit_rpart,newdata=testing,type="class")
 pred_testing<-predict(modFit_rforest,testing)
@@ -74,7 +74,7 @@ pred_validate_as_char<-as.character(pred_validate)
 ```
 
 ## helper function for submitting + final submission
-```{r}
+```{r helperfunction}
 # requirement therefore: x must be char-vector in form of: answers <- rep("A", 20)
 pml_write_files = function(x){
   n = length(x)
