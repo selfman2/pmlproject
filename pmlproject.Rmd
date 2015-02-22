@@ -11,8 +11,9 @@ output:
     toc: yes
 ---
 
+# Report of Practical Machine Learning Project
 
-## Here loading necessary libraries
+## First of all, loading all necessary R libraries
 ```{r libraryloading}
 library(lattice)
 library(ggplot2)
@@ -23,33 +24,40 @@ library(rpart)
 library(randomForest)
 ```
 
-## Here importing the data 
+## Then, importing the sample data and the validation data
 ```{r importingdata}
 data_validate<-read.csv("data//pml-testing.csv",header = T,na.strings = c(""," ","NA","#DIV/0!"),strip.white=T)
 data_samples<-read.csv("data//pml-training.csv",header = T,na.strings = c(""," ","NA"),strip.white=T)
 ```
 
-## Here cleaning the data
+## Then I clean the data (see code comments)
 ```{r cleaningdata}
 colneed2goIN<-which(colSums(is.na(data_samples))>19000) #find those with more than 19000 NAs
 data_samples_clean_tmp1<-data_samples[,-c(colneed2goIN)] #sort those NAs out
-data_samples_clean_tmp2<-data_samples_clean_tmp1[,-c(1:7)] #sort column 1 to 7 out, as inneccesary for model/pr
-dsclean<-data_samples_clean_tmp2
+data_samples_clean_tmp2<-data_samples_clean_tmp1[,-c(1:7)] #sort out column 1 to 7, as inneccesary for model/pr
+dsclean<-data_samples_clean_tmp2 # all predictors are int or num; outcome classe is factor
 ```
 
-## Here partitioning the data
+## After this, partitioning of the sample data into training and testing
 ```{r partitioningdata}
 set.seed(13323) #for reproducability
 inTrain<-createDataPartition(y=dsclean$classe, p=0.7,list=FALSE)
 training<-dsclean[inTrain,]
 testing<-dsclean[-inTrain,]
+
+### if i understand correctly, in this example/project preprocessing it is NOT necessary
+### but maybe in other projects in the future (i think it is necessary, if predictors
+### are very skewed)
+# sub_training <- training[c(-53)]
+# preProc <- preProcess(sub_training, method="pca", thresh=0.8, na.remove=TRUE)
 ```
 
-## Here fitting different models with training data
+## Then I do a modelfitting (tried 2 others, without success), plus: demonstrating some figures of the model, primarily confusion matrix
 ```{r models}
 #modFit_rpart<-rpart(classe ~ .,data=training)
 #modFit_glm<-train(classe~.,method="glm",data=training)
 modFit_rforest<-randomForest(formula=classe~.,data=training,ntree=500)
+
 #looking at some figures first, before we accept the modFit_rforest
 modFit_rforest$confusion
 modFit_rforest$importance
@@ -57,23 +65,29 @@ head(round(modFit_rforest$err.rate,5),100) #shortened! otherwise, way too long
 head(modFit_rforest$votes,200) #shortened! otherwise, way too long for report
 ```
 
-## Here predicting on training/testing, respectively validation-data
+## Finally, predicting on training/testing (with determining of accuracy, plus cross-validation), and prediction with validation-data
 ```{r prediction}
 ### first: check that colnames of training/testing and validate match!!!
+### this (features being of same class and factor levels) i checked manually;
+### they were/are all of the same class! 
 # pred_testing<-predict(modFit_rpart,newdata=testing,type="class")
 pred_testing<-predict(modFit_rforest,testing)
-table(pred_testing,testing$classe)
+table(pred_testing,testing$classe) 
+# the result is sufficently accurate! 5855/5885 = 0.9949
+# thus i will/can use it for the validation dataset to predict classe of it
 
-### crossvalidation, but not quite sure, how to interpret this rightly
-training_s<-training[,c(1:52)]
-my_rfcv<-rfcv(training_s,training$classe,cv.fold=5)
+### crossvalidation, but not quite sure, how to interpret this rightly;
+### because http://www.stat.berkeley.edu/~breiman/RandomForests/cc_home.htm#ooberr
+### says there is no crossvalidation necessary with randomForest
+#training_s<-training[,c(1:52)]
+#my_rfcv<-rfcv(training_s,training$classe,cv.fold=5)
 
 ### finally predict on validation-data for latter submission
 pred_validate<-predict(modFit_rforest,data_validate)
 pred_validate_as_char<-as.character(pred_validate)
 ```
 
-## helper function for submitting + final submission
+## Helper function for distinct files + final submission
 ```{r helperfunction}
 # requirement therefore: x must be char-vector in form of: answers <- rep("A", 20)
 pml_write_files = function(x){
@@ -85,6 +99,6 @@ pml_write_files = function(x){
 }
 
 ###
-### generating 20 files for submission from my vector of chars
+### here: generating the 20 files for submission from my vector of chars
 pml_write_files(pred_validate_as_char)
 ```
